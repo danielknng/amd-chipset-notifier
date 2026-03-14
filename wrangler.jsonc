@@ -21,7 +21,7 @@
   "kv_namespaces": [
     {
       "binding": "STATE",
-	  // Add a KV-Sotrage and paste its ID here. This one wont work!
+	  // Add a KV-Storage and paste its ID here. This one won't work!
       "id": "7a1461671dca488aab9d9333f410387b"
     }
   ]
