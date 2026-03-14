@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "amd-x870e-discord-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-03-14",
+
+  "triggers": {
+    "crons": [
+      "0 * * * *"
+    ]
+  },
+
+  "vars": {
+    "AMD_PAGE_URL": "https://www.amd.com/en/support/downloads/drivers.html/chipsets/am5/x870e.html",
+    "PRODUCT_NAME": "AMD Chipset Drivers",
+    "KV_KEY": "amd-x870e-chipset-version"
+  },
+
+  "kv_namespaces": [
+    {
+      "binding": "STATE",
+      "id": "HIER_DEINE_KV_NAMESPACE_ID"
+    }
+  ]
+}
