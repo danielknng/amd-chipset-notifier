@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "amd-chipset-notifier",
+  "main": "src/index.js",
+  "compatibility_date": "2026-03-14",
+
+  "triggers": {
+    "crons": [
+      "0 * * * *"
+    ]
+  },
+
+  "vars": {
+	// The AMD driver page is not board-specific. AM4 and AM5 share the same chipset driver. 
+	// This is the URL that'll be send to your Discord.
+    "AMD_PAGE_URL": "https://www.amd.com/en/support/downloads/drivers.html/chipsets/am5/x870e.html",
+    "PRODUCT_NAME": "AMD Chipset Drivers",
+    "KV_KEY": "amd-chipset-version"
+  },
+
+  "kv_namespaces": [
+    {
+      "binding": "STATE",
+	  // Add a KV-Sotrage and paste its ID here. This one wont work!
+      "id": "7a1461671dca488aab9d9333f410387b"
+    }
+  ]
+}
