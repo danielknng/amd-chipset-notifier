@@ -24,7 +24,7 @@ async function fetchHtml(url) {
     method: "GET",
     headers: {
       // AMD blocks requests without a User-Agent header
-      "user-agent": "Mozilla/5.0 amd-x870e-discord-worker/1.0",
+      "user-agent": "Mozilla/5.0 amd-chipset-notifier/1.0",
       "accept-language": "en-US,en;q=0.9"
     }
   });
