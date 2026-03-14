@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "amd-x870e-discord-worker",
+  "name": "x870e-chipset-notifier",
   "main": "src/index.js",
   "compatibility_date": "2026-03-14",
 
