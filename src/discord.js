@@ -24,6 +24,8 @@ function buildDiscordMessage(config, data) {
   if (data.forceNotify) {
     return {
       content:
+        // Discord ignores newlines ("\n") at the start of a message. 
+        // We therefore have to send a Zero Width Space (U+200B). 
         "\u200B\n" +
         "**TEST NOTIFICATION**\n" +
         "Product: " + config.productName + "\n" +
