@@ -55,6 +55,9 @@ You can verify the endpoints on your worker domain afterwards.
 | /state         | Returns the current state from KV as JSON                |
 | /notify-test   | Runs a check and always sends a Discord notification     |
 
+#### Blogpost
+I wrote a small [Blogpost](https://knng.de/blog/amd-chipset-notifier/) about this. Feel free to check it out! :)
+
 ## License
 
 MIT
