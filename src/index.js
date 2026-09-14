@@ -33,15 +33,16 @@ export default {
       if (url.pathname === "/state") {
         const config = getConfig(env);
         validateConfig(config);
-        const state = await loadStoredState(env, config.kvKey);
 
-        return jsonResponse(
-          {
-            ok: true,
-            state: state || null
-          },
-          200
+        const states = await Promise.all(
+          config.targets.map(async (target) => ({
+            kvKey: target.kvKey,
+            productName: target.productName,
+            state: await loadStoredState(env, target.kvKey) || null
+          }))
         );
+
+        return jsonResponse({ ok: true, states }, 200);
       }
 
       return new Response("OK", { status: 200 });
@@ -64,25 +65,50 @@ async function runCheck(env, options = {}) {
   const forceNotify = options.forceNotify === true;
   const manual = options.manual === true;
 
-  const current = await fetchDriverInfo(config);
+  const results = [];
+
+  // Each target is checked and notified independently, one target
+  // failing does not stop the others from running.
+  for (const target of config.targets) {
+    try {
+      results.push(await runCheckForTarget(env, target, forceNotify, manual));
+    } catch (error) {
+      results.push({
+        ok: false,
+        kvKey: target.kvKey,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
+  return {
+    ok: results.every((result) => result.ok !== false),
+    manual,
+    results
+  };
+}
+
+async function runCheckForTarget(env, target, forceNotify, manual) {
+  const current = await fetchDriverInfo(target);
 
   // null on the very first run before any state has been saved
-  const previous = await loadStoredState(env, config.kvKey);
+  const previous = await loadStoredState(env, target.kvKey);
 
   const currentState = {
-    productName: config.productName,
+    productName: target.productName,
     version: current.version,
     releaseDate: current.releaseDate,
-    pageUrl: config.amdPageUrl,
+    pageUrl: target.amdPageUrl,
     checkedAt: new Date().toISOString()
   };
 
   // First run: no previous version to compare against, just save and exit
   if (!previous) {
-    await saveCurrentState(env, config.kvKey, currentState);
+    await saveCurrentState(env, target.kvKey, currentState);
 
     return {
       ok: true,
+      kvKey: target.kvKey,
       initialized: true,
       changed: false,
       notified: false,
@@ -98,7 +124,7 @@ async function runCheck(env, options = {}) {
   const shouldNotify = changed || forceNotify;
 
   if (shouldNotify) {
-    await sendDiscordNotification(config, {
+    await sendDiscordNotification(target, {
       previousVersion: previous.version,
       currentVersion: current.version,
       releaseDate: current.releaseDate,
@@ -107,14 +133,15 @@ async function runCheck(env, options = {}) {
   }
 
   if (changed) {
-    await saveCurrentState(env, config.kvKey, currentState);
+    await saveCurrentState(env, target.kvKey, currentState);
   } else {
     // No version change, only update the timestamp
-    await updateCheckedAtOnly(env, config.kvKey, previous);
+    await updateCheckedAtOnly(env, target.kvKey, previous);
   }
 
   return {
     ok: true,
+    kvKey: target.kvKey,
     initialized: false,
     changed,
     notified: shouldNotify,
