@@ -14,7 +14,7 @@ The Worker checks one or more configured AMD pages (targets), extracts the versi
 
 **1. Configure targets**
 
-Targets are defined in `src/config.js` as a plain array, not as `wrangler.jsonc` vars:
+Targets are defined in `src/config.js` as a plain array:
 
 ```js
 const TARGETS = [
