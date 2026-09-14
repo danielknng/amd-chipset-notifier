@@ -4,7 +4,7 @@ A Cloudflare Worker that checks the AMD driver download page once per hour and s
 
 ## How it works
 
-The Worker scrapes the configured AMD page, extracts the version number and release date via regex, and compares them against the last known state stored in Cloudflare KV. If a newer version is found, it posts a message to one or more Discord webhooks.
+The Worker checks one or more configured AMD pages (targets), extracts the version number and release date via regex, and compares them against the last known state stored in Cloudflare KV. If a newer version is found for a target, it posts a message to that target's Discord webhook(s).
 
 ## Requirements
 
@@ -12,17 +12,21 @@ The Worker scrapes the configured AMD page, extracts the version number and rele
 
 ## Setup
 
-**1. Configuration**
+**1. Configure targets**
 
-All variables are set in `wrangler.jsonc` under `vars`, except for the webhook URL which must be a secret.
+Targets are defined in `src/config.js` as a plain array, not as `wrangler.jsonc` vars:
 
-| Variable             | Description                              | Default                        |
-|----------------------|------------------------------------------|--------------------------------|
-| AMD_PAGE_URL         | URL of the AMD driver download page      | X870E chipset page             |
-| PRODUCT_NAME         | Product name used to locate the version  | AMD Chipset Drivers            |
-| KV_KEY               | Key under which the state is stored in your KV      | amd-chipset-version      |
-| DISCORD_WEBHOOK_URL  | Webhook URL(s), comma-separated          | (required, set as secret in Cloudflare)      |
+```js
+const TARGETS = [
+  {
+    id: "x870e",
+    amdPageUrl: "https://www.amd.com/en/support/downloads/drivers.html/chipsets/am5/x870e.html",
+    productName: "AMD Chipset Drivers"
+  }
+];
+```
 
+Add one object per AMD page you want to watch, e.g. one per chipset/motherboard, so the Discord message always links to the correct page even though the underlying driver is the same across a socket generation. Each target needs a unique `id`, used both for its KV key and its webhook secret name.
 
 **2. Create a KV namespace**
 
@@ -33,14 +37,14 @@ Cloudflare Dashboard -> Storage & databases -> Worker KV -> Create Instance
 Copy the ID into `wrangler.jsonc` under `kv_namespaces`.
 
 
-**3. Set the Discord webhook URL as a secret**
+**3. Set a Discord webhook secret per target**
 
 ```
 Cloudflare Dashboard -> Compute -> Workers & Pages -> Click your existing worker or create a new one 
-Click on Settings -> Variables and Secrets -> Add -> "Type": Secret -> "Variable name": DISCORD_WEBHOOK_URL -> "Value": Your Webhook-URL
+Click on Settings -> Variables and Secrets -> Add -> "Type": Secret -> "Variable name": DISCORD_WEBHOOK_URL_<ID> -> "Value": Your Webhook-URL
 ```
 
-To notify multiple Discord servers, provide a comma-separated list of webhook URLs.
+`<ID>` is the target's `id` from `config.js`, uppercased, e.g. `id: "x870e"` needs a secret named `DISCORD_WEBHOOK_URL_X870E`. To notify multiple Discord servers for the same target, provide a comma-separated list of webhook URLs in that one secret.
 
 **4. Deploy**  
 
