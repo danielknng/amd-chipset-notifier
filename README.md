@@ -37,19 +37,29 @@ Cloudflare Dashboard -> Storage & databases -> Worker KV -> Create Instance
 Copy the ID into `wrangler.jsonc` under `kv_namespaces`.
 
 
-**3. Set a Discord webhook secret per target**
+**3. Connect the repository to Cloudflare**
 
 ```
-Cloudflare Dashboard -> Compute -> Workers & Pages -> Click your existing worker or create a new one 
-Click on Settings -> Variables and Secrets -> Add -> "Type": Secret -> "Variable name": DISCORD_WEBHOOK_URL_<ID> -> "Value": Your Webhook-URL
+Cloudflare Dashboard -> Compute (Workers) -> Workers & Pages -> Create -> Connect to Git
+Authorize the Cloudflare GitHub app, select this repository and the branch to deploy from (e.g. main)
 ```
 
-`<ID>` is the target's `id` from `config.js`, uppercased, e.g. `id: "x870e"` needs a secret named `DISCORD_WEBHOOK_URL_X870E`. To notify multiple Discord servers for the same target, provide a comma-separated list of webhook URLs in that one secret.
+Cloudflare will build and deploy the Worker automatically on every push to that branch. No local `wrangler deploy` needed.
 
-**4. Deploy**  
+**4. Set a Discord webhook secret per target**
 
-All that's left is to deploy/re-deploy your worker.  
-You can verify the endpoints on your worker domain afterwards.
+```
+Cloudflare Dashboard -> Compute -> Workers & Pages -> Click your worker
+Click on Settings -> Variables and Secrets -> Add
+"Variable name": DISCORD_WEBHOOK_URL_<ID>
+"Value": Your Webhook-URL
+"Type": Secret
+```
+
+`<ID>` is the target's `id` from `config.js`, uppercased, e.g. `id: "x870e"` needs a variable named `DISCORD_WEBHOOK_URL_X870E`. To notify multiple Discord servers for the same target, provide a comma-separated list of webhook URLs in that one value.
+
+> [!WARNING]
+> Make sure the Type is set to Secret, not the default text type, before saving. A plain text variable is readable in the dashboard and via the API, a webhook URL set as a secret is not. Select Deploy afterwards to apply it.
 
 ## Endpoints
 
