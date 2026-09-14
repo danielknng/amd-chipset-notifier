@@ -7,12 +7,12 @@ const TARGETS = [
     id: "x870e",
     amdPageUrl: "https://www.amd.com/en/support/downloads/drivers.html/chipsets/am5/x870e.html",
     productName: "AMD Chipset Drivers"
+  },
+  {
+    id: "b550e",
+    amdPageUrl: "https://www.amd.com/en/support/downloads/drivers.html/chipsets/am4/b550.html",
+    productName: "AMD Chipset Drivers"
   }
-  // {
-  //   id: "x670e",
-  //   amdPageUrl: "https://www.amd.com/en/support/downloads/drivers.html/chipsets/am5/x670e.html",
-  //   productName: "AMD Chipset Drivers"
-  // }
 ];
 
 /**
