@@ -15,6 +15,7 @@ export async function fetchDriverInfo(config) {
     productName: config.productName,
     version: parsed.version,
     releaseDate: parsed.releaseDate,
+    fileSize: parsed.fileSize,
     changelog: parsed.releaseNotesUrl ? await fetchChangelog(parsed.releaseNotesUrl) : null,
     pageUrl: config.amdPageUrl
   };
@@ -60,6 +61,11 @@ function extractDriverInfo(html, productName) {
     "i"
   );
 
+  const fileSizeRegex = new RegExp(
+    escapedName + "[\\s\\S]{0,1300}?File Size[\\s\\S]{0,100}?([0-9.]+ ?[KMGT]B)",
+    "i"
+  );
+
   const releaseNotesRegex = new RegExp(
     escapedName + "[\\s\\S]{0,2000}?href=\"([^\"]*release-notes[^\"]*)\"",
     "i"
@@ -67,12 +73,14 @@ function extractDriverInfo(html, productName) {
 
   const versionMatch = text.match(versionRegex);
   const releaseDateMatch = text.match(releaseDateRegex);
+  const fileSizeMatch = text.match(fileSizeRegex);
   const releaseNotesMatch = html.match(releaseNotesRegex);
 
   // [1] is the first capture group (the part inside the parentheses in the regex)
   return {
     version: versionMatch ? versionMatch[1] : null,
     releaseDate: releaseDateMatch ? releaseDateMatch[1] : null,
+    fileSize: fileSizeMatch ? fileSizeMatch[1] : null,
     releaseNotesUrl: releaseNotesMatch ? normalizeUrl(releaseNotesMatch[1]) : null
   };
 }
