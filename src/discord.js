@@ -2,8 +2,19 @@
  * Sends a message to all configured Discord webhooks.
  */
 export async function sendDiscordNotification(config, data) {
-  const payload = buildDiscordMessage(config, data);
+  await postToWebhooks(config, buildDiscordMessage(config, data));
+}
 
+/**
+ * Reports a failed check, e.g. the AMD page's markup changed and the
+ * version regex no longer matches, so it doesn't go unnoticed until
+ * someone happens to look at the Worker's logs.
+ */
+export async function sendDiscordError(config, message) {
+  await postToWebhooks(config, buildErrorMessage(config, message));
+}
+
+async function postToWebhooks(config, payload) {
   for (const url of config.discordWebhookUrls) {
     const response = await fetch(url, {
       method: "POST",
@@ -19,7 +30,19 @@ export async function sendDiscordNotification(config, data) {
   }
 }
 
-// AMD's own brand red
+function buildErrorMessage(config, message) {
+  return {
+    embeds: [
+      {
+        author: { name: config.productName },
+        title: "Check failed",
+        description: "`" + message + "`"
+      }
+    ]
+  };
+}
+
+// AMD's own brand red, confirmed from amd.com's own stylesheet (not a third-party guess)
 const EMBED_COLOR = 0xed1c24;
 
 function buildDiscordMessage(config, data) {
