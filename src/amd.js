@@ -44,7 +44,7 @@ async function fetchHtml(url) {
  * correct table. The href regex runs on the raw HTML (not the cleaned
  * plaintext) since cleanupHtmlToText strips all tags, hrefs included.
  */
-function extractDriverInfo(html, productName) {
+export function extractDriverInfo(html, productName) {
   const text = cleanupHtmlToText(html);
   const escapedName = escapeRegex(productName);
 
