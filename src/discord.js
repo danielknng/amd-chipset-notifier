@@ -19,24 +19,43 @@ export async function sendDiscordNotification(config, data) {
   }
 }
 
+// AMD's own brand red, confirmed from amd.com's own stylesheet (not a third-party guess)
+const EMBED_COLOR = 0xed1c24;
+
 function buildDiscordMessage(config, data) {
-  // Discord ignores newlines ("\n") at the start of a message.
-  // We therefore have to send a Zero Width Space (U+200B).
-  const lines = [
-    "\u200B",
-    // Different title for test notifications so it is clear this is not a real find
-    "**" + (data.forceNotify ? "TEST NOTIFICATION" : "New AMD Chipset Driver released!") + "**",
-    "Product: " + config.productName,
-    "Last Version: " + data.previousVersion,
-    "Current Version: " + data.currentVersion,
-    "Release date: " + (data.releaseDate || "unknown")
+  const fields = [
+    { name: "Last Version", value: "`" + data.previousVersion + "`", inline: false },
+    { name: "Current Version", value: "`" + data.currentVersion + "`", inline: false },
+    { name: "Release date", value: "`" + (data.releaseDate || "unknown") + "`", inline: false }
   ];
 
-  if (data.changelog) {
-    lines.push("Changelog: " + data.changelog);
+  if (data.fileSize) {
+    fields.push({ name: "File size", value: "`" + data.fileSize + "`", inline: false });
   }
 
-  lines.push((data.forceNotify ? "Page: " : "Download: ") + config.amdPageUrl);
+  if (data.changelog) {
+    fields.push({ name: "Changelog", value: quoteLines(data.changelog), inline: false });
+  }
 
-  return { content: lines.join("\n") };
+  return {
+    embeds: [
+      {
+        author: { name: config.productName },
+        // Different title for test notifications so it is clear this is not a real find
+        title: data.forceNotify ? "TEST NOTIFICATION" : "New AMD Chipset Driver released!",
+        url: config.amdPageUrl,
+        color: EMBED_COLOR,
+        fields
+      }
+    ]
+  };
+}
+
+// Discord requires "> " at the start of every line for a blockquote, without
+// this a multi-line changelog would only quote its first line.
+function quoteLines(text) {
+  return text
+    .split("\n")
+    .map((line) => "> " + line)
+    .join("\n");
 }
