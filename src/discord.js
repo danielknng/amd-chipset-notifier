@@ -22,21 +22,15 @@ export async function sendDiscordNotification(config, data) {
 function buildDiscordMessage(config, data) {
   // Discord ignores newlines ("\n") at the start of a message.
   // We therefore have to send a Zero Width Space (U+200B).
-  const lines = ["\u200B"];
-
-  // Different message for test notifications so it is clear this is not a real find
-  if (data.forceNotify) {
-    lines.push("**TEST NOTIFICATION**");
-    lines.push("Product: " + config.productName);
-    lines.push("Current version: " + data.currentVersion);
-  } else {
-    lines.push("**New AMD Chipset Driver released!**");
-    lines.push("Product: " + config.productName);
-    lines.push("Previous: " + data.previousVersion);
-    lines.push("New: " + data.currentVersion);
-  }
-
-  lines.push("Release date: " + (data.releaseDate || "unknown"));
+  const lines = [
+    "\u200B",
+    // Different title for test notifications so it is clear this is not a real find
+    "**" + (data.forceNotify ? "TEST NOTIFICATION" : "New AMD Chipset Driver released!") + "**",
+    "Product: " + config.productName,
+    "Last Version: " + data.previousVersion,
+    "Current Version: " + data.currentVersion,
+    "Release date: " + (data.releaseDate || "unknown")
+  ];
 
   if (data.changelog) {
     lines.push("Changelog: " + data.changelog);
