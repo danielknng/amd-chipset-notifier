@@ -98,6 +98,7 @@ async function runCheckForTarget(env, target, forceNotify, manual) {
     productName: target.productName,
     version: current.version,
     releaseDate: current.releaseDate,
+    fileSize: current.fileSize,
     changelog: current.changelog,
     pageUrl: target.amdPageUrl,
     checkedAt: new Date().toISOString()
@@ -129,6 +130,7 @@ async function runCheckForTarget(env, target, forceNotify, manual) {
       previousVersion: previous.version,
       currentVersion: current.version,
       releaseDate: current.releaseDate,
+      fileSize: current.fileSize,
       changelog: current.changelog,
       forceNotify
     });
