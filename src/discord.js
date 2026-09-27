@@ -42,7 +42,7 @@ function buildErrorMessage(config, message) {
   };
 }
 
-// AMD's own brand red, confirmed from amd.com's own stylesheet (not a third-party guess)
+// AMD's red,
 const EMBED_COLOR = 0xed1c24;
 
 function buildDiscordMessage(config, data) {
