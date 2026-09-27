@@ -4,7 +4,9 @@ A Cloudflare Worker that checks the AMD driver download page once per hour and s
 
 ## How it works
 
-The Worker checks one or more configured AMD pages (targets), extracts the version number and release date via regex, and compares them against the last known state stored in Cloudflare KV. If a newer version is found for a target, it posts a message to that target's Discord webhook(s).
+The Worker checks one or more configured AMD pages (targets), extracts the version number, release date and a changelog summary via regex, and compares them against the last known state stored in Cloudflare KV. If a newer version is found for a target, it posts a message to that target's Discord webhook(s).
+
+The changelog comes from the "Release Notes" page linked from the driver's own entry, not the download page itself, that page only has version/date/file size. Its "Release Highlights" section is usually a one- or two-line summary rather than a detailed list; if AMD ever ships a release notes page without that heading, or drops the link entirely, the changelog is simply left out of the notification rather than failing the whole check.
 
 ## Requirements
 
@@ -34,7 +36,7 @@ Add one object per AMD page you want to watch, e.g. one per chipset/motherboard,
 Cloudflare Dashboard -> Storage & databases -> Worker KV -> Create Instance
 ```
 
-Copy the ID into `wrangler.jsonc` under `kv_namespaces`.
+Copy the Namespace ID into `wrangler.jsonc` under `kv_namespaces`.
 
 
 **3. Connect the repository to Cloudflare**
